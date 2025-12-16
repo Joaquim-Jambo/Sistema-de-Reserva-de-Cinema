@@ -1,0 +1,32 @@
+{
+  "name": "sistema-de-reserva-de-cinema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch ./src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joaquim-Jambo/Sistema-de-Reserva-de-Cinema.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Joaquim-Jambo/Sistema-de-Reserva-de-Cinema/issues"
+  },
+  "homepage": "https://github.com/Joaquim-Jambo/Sistema-de-Reserva-de-Cinema#readme",
+  "devDependencies": {
+    "@types/node": "^25.0.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.6",
+    "express": "^5.2.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0"
+  }
+}
