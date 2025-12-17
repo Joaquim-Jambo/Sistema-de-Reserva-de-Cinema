@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Joaquim-Jambo/Sistema-de-Reserva-de-Cinema#readme",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.2",
     "typescript": "^5.9.3"
   },
@@ -31,6 +32,7 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "neon": "^2.0.0",
     "prisma": "^6.19.1",
     "ts-node": "^10.9.2",

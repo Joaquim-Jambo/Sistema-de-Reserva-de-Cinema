@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express"
 import { z, ZodError } from "zod";
 import prisma from "../config/prismaClient";
-import { Roles } from "../types/roles";
+import { role } from "../types/roles";
 
 export interface AuthenticatedRequest extends Request {
     userId?: string;
@@ -24,7 +24,7 @@ export function validateBody<T extends z.ZodTypeAny>(schema: T) {
     }
 }
 
-export const checkRoles = (allowedRoles: Roles[]) => {
+export const checkRoles = (allowedRoles: role[]) => {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.userId as string
@@ -37,9 +37,8 @@ export const checkRoles = (allowedRoles: Roles[]) => {
                     roleId: true
                 }
             })
-            if (!user || !allowedRoles.includes(user.role.role as Roles))
+            if (!user || !allowedRoles.includes(user.role.role as role))
                 return res.status(403).json({ message: "Acesso negado" });
-
         } catch (error) {
             next(error);
         }

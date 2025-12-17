@@ -1,4 +1,3 @@
-import { Role, User } from "../generated/prisma"
 
-export type Roles = "Admin" | "Client"
+export type role = "Admin" | "Client"
 

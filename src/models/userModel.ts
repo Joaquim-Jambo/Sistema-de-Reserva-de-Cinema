@@ -1,4 +1,4 @@
-import { Roles } from "../types/roles";
+import { role } from "../types/roles";
 
 export interface registerDTO {
     email: string;
@@ -9,7 +9,25 @@ export interface registerDTO {
 }
 
 export interface tokenPayload {
-    userId: string,
+    userId?: string,
+    email?: string,
+    roleId?: string
+}
+
+export interface loginDTO {
     email: string,
-    role: Roles
+    password: string
+}
+
+export interface responseLogin {
+    id?: string,
+    email?: string,
+    role: role,
+    token: string
+}
+
+export interface responseCreate {
+    id?: string,
+    email?: string,
+    role: role
 }

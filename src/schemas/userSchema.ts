@@ -21,6 +21,11 @@ export const paramUserSchema = z.object({
     id: z.uuid()
 })
 
+export const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string()
+})
 
 export type createUserSchema = z.infer<typeof createUserSchema>
 export type paramsUserSchema = z.infer<typeof paramUserSchema>
+export type loginSchema = z.infer<typeof loginSchema>
