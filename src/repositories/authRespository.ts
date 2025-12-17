@@ -1,19 +1,10 @@
 import prisma from "../config/prismaClient";
-import { registerDTO, loginDTO, responseLogin } from "../models/userModel";
-import { User } from "../generated/prisma";
+import { loginDTO, responseLogin } from "../models/userModel";
 import bcrypt from "bcrypt"
 import { generatedToken } from "../../service/authService";
 import { role } from "../types/roles";
 
-export const register = async (data: registerDTO): Promise<User> => {
-    try {
-        const user = await prisma.user.create({ data });
-        return user;
-    } catch (error: any) {
-        console.error(error.message)
-        throw new Error('Erro ao registrar o usuário');
-    }
-}
+
 
 export const login = async (data: loginDTO): Promise<responseLogin> => {
     try {

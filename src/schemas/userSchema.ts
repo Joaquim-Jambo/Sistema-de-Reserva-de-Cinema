@@ -15,7 +15,7 @@ export const createUserSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",
     path: ['confirmPassword']
-})
+})  
 
 export const paramUserSchema = z.object({
     id: z.uuid()

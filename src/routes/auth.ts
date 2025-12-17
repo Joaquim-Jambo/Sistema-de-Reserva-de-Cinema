@@ -1,12 +1,14 @@
 import express from "express"
 import { validateBody } from "../middlewares/auth";
-import { createUserSchema, loginSchema } from "../schemas/userSchema";
-import { loginController, registerController } from "../controllers/authController";
+import { loginSchema } from "../schemas/userSchema";
+import { loginController, } from "../controllers/authController";
+import { createClientController } from "../controllers/clientController";
+import { createClientSchema } from "../schemas/clientSchema";
 
 
 const authRoutes = express.Router();
 
-authRoutes.post('/register', validateBody(createUserSchema), registerController);
+authRoutes.post('/register', validateBody(createClientSchema), createClientController);
 authRoutes.post('/login', validateBody(loginSchema), loginController);
 
 export default authRoutes;

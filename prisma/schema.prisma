@@ -40,8 +40,8 @@ model User {
 model Client {
   id              String    @id @default(uuid())
   userId          String    @unique @map("user_id")
-  phone           String?
-  dateOfBirth     DateTime? @map("date_of_birth")
+  phone           String
+  dateOfBirth     DateTime @map("date_of_birth")
   preferredGenres String[]  @map("preferred_genres")
   createdAt       DateTime  @default(now()) @map("created_at")
   user            User      @relation(fields: [userId], references: [id])
