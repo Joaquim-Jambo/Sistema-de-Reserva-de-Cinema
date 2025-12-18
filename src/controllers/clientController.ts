@@ -13,7 +13,6 @@ export const createClientController = async (req: Request<{}, {}, createClientSc
             return res.status(401).json({ message: error.message });
         res.status(500).json({ message: 'Erro ao registrar o cliente' });
     }
-
 }
 export const getAllClientController = async (req: Request, res: Response) => {
     try {
