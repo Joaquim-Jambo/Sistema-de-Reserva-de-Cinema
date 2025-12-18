@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { email, z } from "zod"
 
 export const createUserSchema = z.object({
     email: z.string().email({ message: 'Email inválido' }),
@@ -21,6 +21,11 @@ export const paramUserSchema = z.object({
     id: z.uuid()
 })
 
+export const paramClientSchema = z.object({
+    id: z.string().uuid({ message: 'ID de cliente inválido' }).optional(),
+    email: z.string().email({ message: 'Email inválido' }).optional()
+})
+
 export const loginSchema = z.object({
     email: z.string().email(),
     password: z.string()
@@ -29,3 +34,4 @@ export const loginSchema = z.object({
 export type createUserSchema = z.infer<typeof createUserSchema>
 export type paramsUserSchema = z.infer<typeof paramUserSchema>
 export type loginSchema = z.infer<typeof loginSchema>
+export type paramClientSchema = z.infer<typeof paramClientSchema>;

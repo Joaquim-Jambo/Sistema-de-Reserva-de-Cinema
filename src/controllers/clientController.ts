@@ -1,4 +1,4 @@
-import { createClient, getAllClient } from "../repositories/clientRepository";
+import { createClient, getAllClient, getOneClient } from "../repositories/clientRepository";
 import { createClientSchema } from "../schemas/clientSchema";
 import { type Request, type Response } from "express";
 
@@ -11,7 +11,7 @@ export const createClientController = async (req: Request<{}, {}, createClientSc
         console.error(error);
         if (error.message.includes("registrado"))
             return res.status(401).json({ message: error.message });
-        res.status(500).json({ message: 'Erro ao registrar o cliente' });
+        res.status(500).json({ message: 'Erro interno servidor' });
     }
 }
 export const getAllClientController = async (req: Request, res: Response) => {
@@ -22,5 +22,17 @@ export const getAllClientController = async (req: Request, res: Response) => {
         res.status(200).json(clientes);
     } catch (error: any) {
         res.status(500).json(error)
+    }
+}
+
+export const getOneClientController = async (req: Request, res: Response) => {
+    try {
+        const { id, email } = req.query;
+        const cliente = await getOneClient(id as string, email as string);
+        return res.status(200).json(cliente);
+    } catch (error: any) {
+        if (error.message.includes("encontrado"))
+            return res.status(404).json({ message: error.message });
+        res.status(500).json({ message: 'Erro interno servidor' });
     }
 }

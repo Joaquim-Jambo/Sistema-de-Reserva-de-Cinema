@@ -93,10 +93,38 @@ export const getAllClient = async (page: number = 1, limit: number = 10) => {
                 limit,
                 total,
                 totalPages: Math.ceil(total / limit)
-            }   
+            }
         }
     } catch (error: any) {
         console.log(error.message);
         throw new Error(error.message || 'Erro ao listar os clientes')
+    }
+}
+
+export const getOneClient = async (id?: string, email?: string) => {
+    try {
+        let client;
+        if (id) {
+            client = await prisma.user.findUnique({
+                where: { id },
+                select: { name: true, email: true, client: true }
+            })
+            if (!client)
+                throw new Error("Cliente nao encontrado !");
+            return (client);
+        }
+        else if (email) {
+            client = await prisma.user.findUnique({
+                where: { email },
+                select: { name: true, email: true, client: true }
+            })
+            if (!client)
+                throw new Error("Cliente nao encontrado !");
+            return (client);
+        }
+        return null;
+    } catch (error: any) {
+        console.log(error.message);
+        throw new Error(error.message || 'Erro ao listar o cliente')
     }
 }

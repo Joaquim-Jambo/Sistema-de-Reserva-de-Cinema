@@ -3,10 +3,10 @@ import authRoutes from './auth';
 import adminRoutes from './admin';
 import clientRoutes from './client';
 
-const router = express()
+const routes = express()
 
-router.use('/auth', authRoutes);
-router.use('/admin', adminRoutes);
-router.use('/clients', clientRoutes);
+routes.use('/auth', authRoutes);
+routes.use('/admin', adminRoutes);
+routes.use('/clients', clientRoutes);
 
-export default router;
+export default routes;
