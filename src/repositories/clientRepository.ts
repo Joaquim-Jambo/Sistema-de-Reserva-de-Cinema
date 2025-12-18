@@ -93,7 +93,7 @@ export const getAllClient = async (page: number = 1, limit: number = 10) => {
                 limit,
                 total,
                 totalPages: Math.ceil(total / limit)
-            }
+            }   
         }
     } catch (error: any) {
         console.log(error.message);
