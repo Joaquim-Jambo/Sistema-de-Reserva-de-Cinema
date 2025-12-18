@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import prisma from "../config/prismaClient";
 import { registerDTO } from "../models/userModel";
+import { generatedToken } from "../service/authService";
 
 
 export const createAdmin = async (data: registerDTO) => {
@@ -21,7 +22,12 @@ export const createAdmin = async (data: registerDTO) => {
                 name: data.name
             }
         })
-        return admin;
+        const token = generatedToken({ userId: admin.id, roleId: admin.roleId, email: admin.email });
+        const response = {
+            ...admin,
+            token
+        }
+        return response;
     } catch (error: any) {
         console.error(error.message)
         throw new Error(error.message || 'Erro ao registrar o admin');

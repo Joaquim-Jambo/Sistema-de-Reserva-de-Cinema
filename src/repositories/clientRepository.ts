@@ -1,6 +1,7 @@
 import prisma from "../config/prismaClient";
 import bcrypt from "bcrypt"
 import { clientCreate } from "../models/clientModel";
+import { generatedToken } from "../service/authService";
 
 
 export const createClient = async (data: clientCreate) => {
@@ -30,10 +31,14 @@ export const createClient = async (data: clientCreate) => {
             },
             include: { client: true, role: true }
         })
-        return cliente;
+        const token = generatedToken({ userId: cliente.id, email: cliente.email, roleId: cliente.roleId })
+        const response = {
+            ...cliente,
+            token
+        }
+        return response;
     } catch (error: any) {
         console.error(error.message)
-         console.error(error.message)
         throw new Error(error.message || 'Erro ao registrar o client');
     }
 }

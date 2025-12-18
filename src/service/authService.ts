@@ -1,5 +1,5 @@
 import jwt, { type SignOptions } from "jsonwebtoken"
-import { tokenPayload } from "../src/models/userModel"
+import { tokenPayload } from "../models/userModel"
 
 export const generatedToken = (payload: tokenPayload) => {
     const options: SignOptions = {

@@ -1,7 +1,7 @@
 import prisma from "../config/prismaClient";
 import { loginDTO, responseLogin } from "../models/userModel";
 import bcrypt from "bcrypt"
-import { generatedToken } from "../../service/authService";
+import { generatedToken } from "../service/authService";
 import { role } from "../types/roles";
 
 

@@ -2,9 +2,12 @@ import type { NextFunction, Request, Response } from "express"
 import { z, ZodError } from "zod";
 import prisma from "../config/prismaClient";
 import { role } from "../types/roles";
+import { verifyToken } from "../service/authService";
+import { tokenPayload } from "../models/userModel";
 
 export interface AuthenticatedRequest extends Request {
     userId?: string;
+    user?: tokenPayload;
 }
 
 export function validateBody<T extends z.ZodTypeAny>(schema: T) {
@@ -27,7 +30,9 @@ export function validateBody<T extends z.ZodTypeAny>(schema: T) {
 export const checkRoles = (allowedRoles: role[]) => {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         try {
-            const userId = req.userId as string
+            const userId = req.user?.userId;
+            if (!userId)
+                return res.status(401).json({ message: "Usuário não autenticado" });
             const user = await prisma.user.findUnique({
                 where: {
                     id: userId
@@ -39,7 +44,24 @@ export const checkRoles = (allowedRoles: role[]) => {
             })
             if (!user || !allowedRoles.includes(user.role.role as role))
                 return res.status(403).json({ message: "Acesso negado" });
+            next();
         } catch (error) {
+            next(error);
+        }
+    }
+}
+
+export const authenticate = () => {
+    return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        try {
+            const token = req.header('Authorization')?.replace('Bearer ', '');
+            if (!token)
+                return res.status(401).json({ message: "Token nao encontrado" });
+            const decode = verifyToken(token);
+            req.user = decode as tokenPayload;
+            req.userId = decode?.userId;
+            next();
+        } catch (error: any) {
             next(error);
         }
     }
