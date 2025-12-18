@@ -2,8 +2,6 @@ import prisma from "../config/prismaClient";
 import bcrypt from "bcrypt"
 import { clientCreate, clientUpdate } from "../models/clientModel";
 import { generatedToken } from "../service/authService";
-import { da } from "zod/v4/locales";
-import { Client } from "../generated/prisma";
 
 
 export const createClient = async (data: clientCreate) => {
@@ -70,7 +68,7 @@ export const updateClient = async (data: clientUpdate, id: string) => {
         return (cliente);
     } catch (error: any) {
         console.error(error.message);
-        throw new Error(error.message || 'Erro ao actualizar o cliente');
+        throw new Error(error.message || 'Erro ao atualizar o cliente');
     }
 }
 
@@ -110,7 +108,7 @@ export const getOneClient = async (id?: string, email?: string) => {
                 select: { name: true, email: true, client: true }
             })
             if (!client)
-                throw new Error("Cliente nao encontrado !");
+                throw new Error("Cliente não encontrado!");
             return (client);
         }
         else if (email) {
@@ -119,7 +117,7 @@ export const getOneClient = async (id?: string, email?: string) => {
                 select: { name: true, email: true, client: true }
             })
             if (!client)
-                throw new Error("Cliente nao encontrado !");
+                throw new Error("Cliente não encontrado!");
             return (client);
         }
         return null;
