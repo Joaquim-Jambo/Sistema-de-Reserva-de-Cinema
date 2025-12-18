@@ -1,7 +1,9 @@
 import prisma from "../config/prismaClient";
 import bcrypt from "bcrypt"
-import { clientCreate } from "../models/clientModel";
+import { clientCreate, clientUpdate } from "../models/clientModel";
 import { generatedToken } from "../service/authService";
+import { da } from "zod/v4/locales";
+import { Client } from "../generated/prisma";
 
 
 export const createClient = async (data: clientCreate) => {
@@ -39,6 +41,62 @@ export const createClient = async (data: clientCreate) => {
         return response;
     } catch (error: any) {
         console.error(error.message)
-        throw new Error(error.message || 'Erro ao registrar o client');
+        throw new Error(error.message || 'Erro ao registrar o cliente');
+    }
+}
+
+export const updateClient = async (data: clientUpdate, id: string) => {
+    try {
+        if (data.password) {
+            const hashPassword = await bcrypt.hash(data.password, 10);
+            data.password = hashPassword;
+        }
+        const cliente = await prisma.user.update({
+            where: { id },
+            data: {
+                name: data.name,
+                email: data.email,
+                password: data.password,
+                client: {
+                    update: {
+                        phone: data.phone,
+                        dateOfBirth: data.dateOfBirth,
+                        preferredGenres: data.preferredGenres
+                    }
+                }
+            },
+            include: { client: true }
+        })
+        return (cliente);
+    } catch (error: any) {
+        console.error(error.message);
+        throw new Error(error.message || 'Erro ao actualizar o cliente');
+    }
+}
+
+export const getAllClient = async (page: number = 1, limit: number = 10) => {
+    try {
+        const skip = (page - 1) * limit;
+        const [clientes, total] = await Promise.all([
+            prisma.user.findMany({
+                select: { name: true, email: true, client: true },
+                skip,
+                take: limit,
+                orderBy: { name: 'asc' }
+            }),
+            prisma.user.count()
+        ])
+        return {
+            data: clientes,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit)
+            }
+        }
+    } catch (error: any) {
+        console.log(error.message);
+        throw new Error(error.message || 'Erro ao listar os clientes')
     }
 }

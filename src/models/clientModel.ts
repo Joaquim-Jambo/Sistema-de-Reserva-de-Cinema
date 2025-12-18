@@ -9,3 +9,11 @@ export interface clientCreate {
 }
 
 
+export interface clientUpdate{
+    name?: string,
+    email?: string,
+    password?: string,
+    preferredGenres?: string[],
+    phone?: string,
+    dateOfBirth?: string
+}
