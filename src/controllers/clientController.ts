@@ -1,6 +1,6 @@
-import { createClient } from "../repositories/clientRepository";
+import { createClient, getAllClient } from "../repositories/clientRepository";
 import { createClientSchema } from "../schemas/clientSchema";
-import type { Request, Response } from "express";
+import { type Request, type Response } from "express";
 
 export const createClientController = async (req: Request<{}, {}, createClientSchema>, res: Response) => {
     try {
@@ -14,4 +14,14 @@ export const createClientController = async (req: Request<{}, {}, createClientSc
         res.status(500).json({ message: 'Erro ao registrar o cliente' });
     }
 
+}
+export const getAllClientController = async (req: Request, res: Response) => {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const clientes = await getAllClient(page, limit);
+        res.status(200).json(clientes);
+    } catch (error: any) {
+        res.status(500).json(error)
+    }
 }
