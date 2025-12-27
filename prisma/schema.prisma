@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -22,6 +16,15 @@ model Role {
   @@map("roles")
 }
 
+model Sala {
+  id        String   @id @default(uuid())
+  number    Int
+  capacity  Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("salas")
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -31,8 +34,8 @@ model User {
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  role      Role     @relation(fields: [roleId], references: [id])
   client    Client?
+  role      Role     @relation(fields: [roleId], references: [id])
 
   @@map("users")
 }
@@ -40,8 +43,8 @@ model User {
 model Client {
   id              String    @id @default(uuid())
   userId          String    @unique @map("user_id")
-  phone           String
-  dateOfBirth     DateTime @map("date_of_birth")
+  phone           String?
+  dateOfBirth     DateTime? @map("date_of_birth")
   preferredGenres String[]  @map("preferred_genres")
   createdAt       DateTime  @default(now()) @map("created_at")
   user            User      @relation(fields: [userId], references: [id])

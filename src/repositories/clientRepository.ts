@@ -2,15 +2,13 @@ import prisma from "../config/prismaClient";
 import bcrypt from "bcrypt"
 import { clientCreate, clientUpdate } from "../models/clientModel";
 import { generatedToken } from "../service/authService";
+import { verifyExistUser } from "../utils/verifyUser";
 
 
 export const createClient = async (data: clientCreate) => {
     try {
 
-        const emailExists = await prisma.user.findUnique({
-            where: { email: data.email }
-        });
-
+        const emailExists = await verifyExistUser(data.email);
         if (emailExists) {
             throw new Error('Email já foi registrado');
         }
