@@ -6,13 +6,12 @@ type NewUser = {
   email: string;
   password: string;
   phone: string;
-  dateOfBirth: string; // ISO date
+  dateOfBirth: string;
   preferredGenres: string[];
 };
 
-// Role IDs fornecidos
-const CLIENT_ROLE_ID = '97a0f548-ae3e-43bf-b2f5-0e4673f9f12c';
-const ADMIN_ROLE_ID = '2ca0eb39-28db-42bc-94f4-1567b23caadb';
+const CLIENT_ROLE_ID = 'f7ff722c-4a6b-4cc9-9630-97147f4d1e61';
+const ADMIN_ROLE_ID = 'cf68d3c4-61d2-40e8-8576-d23ef5c4676f';
 
 const users: NewUser[] = [
   {
