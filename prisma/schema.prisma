@@ -106,6 +106,7 @@ model Session {
   room  Room  @relation(fields: [roomId], references: [id])
   movie Movie @relation(fields: [movieId], references: [id])
 
+  @@unique([roomId, data])
   @@map("sessions")
 }
 
