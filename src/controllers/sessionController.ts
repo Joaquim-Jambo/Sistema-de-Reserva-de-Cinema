@@ -1,7 +1,8 @@
 import { type Request, type Response } from "express"
-import { createSessionSchema } from "../schemas/sessionSchema"
-import { createSession, getAllSession, getSessionByFilter } from "../repositories/sessionRepository"
+import { createSessionSchema, updateSessionSchema } from "../schemas/sessionSchema"
+import { createSession, deleteSession, getAllSession, getSessionByFilter, updateSession } from "../repositories/sessionRepository"
 import { sessionFilter } from "../models/sessionModel";
+import { idSchema } from "../schemas";
 
 export const createSessionController = async (req: Request<{}, {}, createSessionSchema>, res: Response) => {
     try {
@@ -48,6 +49,34 @@ export const getSessionByFilterController = async (req: Request, res: Response) 
         return res.status(500).json({
             error: true,
             message: "Erro interno do servidor ao filtrar sessões."
+        });
+    }
+}
+export const deleteSessionController = async (req: Request<idSchema, {}, {}, {}>, res: Response) => {
+    try {
+        const { id } = req.params;
+        await deleteSession(id);
+        res.status(204).json({})
+    } catch (error: any) {
+        console.error(error);
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao filtrar sessões."
+        });
+    }
+}
+
+export const updateSessionController = async (req: Request<idSchema, {}, updateSessionSchema, {}>, res: Response) => {
+    try {
+        const { data } = req.body;
+        const { id } = req.params;
+        const sessionUpdated = await updateSession(data.toISOString(), id);
+        res.status(200).json(sessionUpdated);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao deletar sessão."
         });
     }
 }

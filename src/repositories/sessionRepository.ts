@@ -121,3 +121,32 @@ export const getSessionByFilter = async (data: Partial<sessionFilter>) => {
         throw new Error(error.message ? `Erro ao filtrar sessões: ${error.message}` : "Erro ao listar as sessões");
     }
 }
+
+
+export const deleteSession = async (id: string) => {
+    try {
+        const filter: Partial<sessionFilter> = { id }
+        await getSessionByFilter(filter);
+        await prisma.session.delete({
+            where: { id }
+        })
+    } catch (error: any) {
+        console.error(error.message)
+        throw new Error(error.message ? `Erro ao deletar sessão: ${error.message}` : "Erro ao deletar a sessão");
+    }
+}
+
+export const updateSession = async (data: string, id: string) => {
+    try {
+        const filter: Partial<sessionFilter> = { id }
+        await getSessionByFilter(filter);
+        const session = await prisma.session.update({
+            where: { id },
+            data: { data }
+        })
+        return (session);
+    } catch (error: any) {
+        console.error(error.message)
+        throw new Error(error.message ? `Erro ao deletar sessão: ${error.message}` : "Erro ao deletar a sessão");
+    }
+}
