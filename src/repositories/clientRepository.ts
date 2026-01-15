@@ -3,8 +3,7 @@ import bcrypt from "bcrypt"
 import { clientCreate, clientUpdate } from "../models/clientModel";
 import { generatedToken } from "../service/authService";
 import { verifyExist } from "../utils/index";
-
-
+import { filterGeneric } from "../models";
 
 export const createClient = async (data: clientCreate) => {
     try {
@@ -40,7 +39,7 @@ export const createClient = async (data: clientCreate) => {
         return response;
     } catch (error: any) {
         console.error(error.message)
-        throw new Error(error.message || 'Erro ao registrar o cliente');
+            throw new Error(error.message ? `Erro ao registrar cliente: ${error.message}` : 'Erro ao registrar o cliente');
     }
 }
 
@@ -69,7 +68,7 @@ export const updateClient = async (data: clientUpdate, id: string) => {
         return (cliente);
     } catch (error: any) {
         console.error(error.message);
-        throw new Error(error.message || 'Erro ao atualizar o cliente');
+            throw new Error(error.message ? `Erro ao atualizar cliente: ${error.message}` : 'Erro ao atualizar o cliente');
     }
 }
 
@@ -85,18 +84,19 @@ export const getAllClient = async (page: number = 1, limit: number = 10) => {
             }),
             prisma.user.count()
         ])
-        return {
+        const response: filterGeneric<typeof clientes> = {
             data: clientes,
             pagination: {
                 page,
                 limit,
                 total,
-                totalPages: Math.ceil(total / limit)
+                totalPage: Math.ceil(total - limit)
             }
-        }
+        };
+        return (response)
     } catch (error: any) {
         console.log(error.message);
-        throw new Error(error.message || 'Erro ao listar os clientes')
+            throw new Error(error.message ? `Erro ao listar clientes: ${error.message}` : 'Erro ao listar os clientes');
     }
 }
 
@@ -124,6 +124,6 @@ export const getOneClient = async (id?: string, email?: string) => {
         return null;
     } catch (error: any) {
         console.log(error.message);
-        throw new Error(error.message || 'Erro ao listar o cliente')
+            throw new Error(error.message ? `Erro ao buscar cliente: ${error.message}` : 'Erro ao buscar o cliente');
     }
 }
