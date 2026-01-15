@@ -2,12 +2,16 @@ import bcrypt from "bcrypt"
 import prisma from "../config/prismaClient";
 import { registerDTO } from "../models/userModel";
 import { generatedToken } from "../service/authService";
-import { verifyExistUser } from "../utils/verifyUser";
+import { clientCreate } from "../models/clientModel";
+import { verifyExist } from "../utils";
 
 
 export const createAdmin = async (data: registerDTO) => {
     try {
-        const emailExists = await verifyExistUser(data.email);
+        const clientVerify: Partial<clientCreate> = {
+            email: data.email
+        }
+        const emailExists = await verifyExist(clientVerify);
         if (emailExists) {
             throw new Error('Email já foi registrado');
         }

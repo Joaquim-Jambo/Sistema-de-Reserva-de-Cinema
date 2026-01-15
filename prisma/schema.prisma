@@ -103,8 +103,9 @@ model Session {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  room  Room  @relation(fields: [roomId], references: [id])
-  movie Movie @relation(fields: [movieId], references: [id])
+  room         Room          @relation(fields: [roomId], references: [id])
+  movie        Movie         @relation(fields: [movieId], references: [id])
+  reservations Reservation[]
 
   @@unique([roomId, data])
   @@map("sessions")
@@ -129,6 +130,8 @@ model Reservation {
   status    ReservationStatus @default(PENDING)
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
+
+  session Session @relation(fields: [sessionId], references: [id])
 
   @@map("reservations")
 }
