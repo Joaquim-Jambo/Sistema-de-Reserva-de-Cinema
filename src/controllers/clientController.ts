@@ -11,9 +11,16 @@ export const createClientController = async (req: Request<{}, {}, createClientSc
         return res.status(201).json(client);
     } catch (error: any) {
         console.error(error);
-        if (error.message.includes("Email já foi registrado"))
-            return res.status(401).json({ message: error.message });
-        res.status(500).json({ message: 'Erro interno do servidor' });
+        if (error.message.includes("Email já foi registrado")) {
+            return res.status(409).json({
+                error: true,
+                message: "O e-mail informado já está cadastrado. Por favor, utilize outro e-mail."
+            });
+        }
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao criar cliente. Tente novamente mais tarde."
+        });
     }
 }
 export const getAllClientController = async (req: Request, res: Response) => {
@@ -23,7 +30,10 @@ export const getAllClientController = async (req: Request, res: Response) => {
         const clientes = await getAllClient(page, limit);
         res.status(200).json(clientes);
     } catch (error: any) {
-        res.status(500).json({ message: error.message || 'Erro interno do servidor' })
+        res.status(500).json({
+            error: true,
+            message: error.message || "Erro interno do servidor ao listar clientes."
+        });
     }
 }
 
@@ -31,14 +41,24 @@ export const getOneClientController = async (req: Request, res: Response) => {
     try {
         const { id, email } = req.query;
         if (!id && !email) {
-            return res.status(400).json({ message: 'É necessário fornecer um ID ou email para buscar o cliente.' });
+            return res.status(400).json({
+                error: true,
+                message: "É necessário fornecer um ID ou e-mail para buscar o cliente."
+            });
         }
         const cliente = await getOneClient(id as string, email as string);
         return res.status(200).json(cliente);
     } catch (error: any) {
-        if (error.message.includes("Cliente não encontrado"))
-            return res.status(404).json({ message: error.message });
-        res.status(500).json({ message: 'Erro interno do servidor' });
+        if (error.message.includes("Cliente não encontrado")) {
+            return res.status(404).json({
+                error: true,
+                message: "Cliente não encontrado. Verifique os dados informados."
+            });
+        }
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao buscar cliente."
+        });
     }
 }
 export const updateClientController = async (req: Request<paramsUserSchema, {}, updateClientSchema>, res: Response) => {
@@ -56,6 +76,9 @@ export const updateClientController = async (req: Request<paramsUserSchema, {}, 
         const clientUpdated = await updateClient(data, id);
         res.status(200).json(clientUpdated);
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao atualizar cliente."
+        });
     }
 }

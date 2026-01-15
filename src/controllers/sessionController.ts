@@ -10,7 +10,10 @@ export const createSessionController = async (req: Request<{}, {}, createSession
         res.status(201).json(session);
     } catch (error: any) {
         console.error(error);
-        res.status(500).json({ message: error.message })
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao criar sessão. Tente novamente mais tarde."
+        });
     }
 }
 
@@ -22,7 +25,10 @@ export const getAllSessionController = async (req: Request, res: Response) => {
         res.status(200).json(sessions);
     } catch (error: any) {
         console.error(error);
-        res.status(500).json({ message: error.message })
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao listar sessões."
+        });
     }
 }
 
@@ -32,12 +38,16 @@ export const getSessionByFilterController = async (req: Request, res: Response) 
             data: req.query.data as string,
             movieId: req.query.movieId as string,
             availableSeats: req.query.availableSeats as string,
-            minAvailableSeats: parseInt(req.query.availableSeats as string)
+            minAvailableSeats: parseInt(req.query.availableSeats as string),
+            id: req.query.id as string
         };
         const sessions = getSessionByFilter(filter);
         res.status(200).json(sessions);
     } catch (error: any) {
         console.error(error);
-        res.status(500).json({ message: error.message })
+        return res.status(500).json({
+            error: true,
+            message: "Erro interno do servidor ao filtrar sessões."
+        });
     }
 }
