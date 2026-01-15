@@ -6,6 +6,7 @@ export interface session {
 
 export interface sessionFilter {
     data: string,
+    id: string,
     movieId: string,
     roomId: string,
     availableSeats: boolean | string,

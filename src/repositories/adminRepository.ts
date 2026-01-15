@@ -32,6 +32,6 @@ export const createAdmin = async (data: registerDTO) => {
         return response;
     } catch (error: any) {
         console.error(error.message)
-        throw new Error(error.message || 'Erro ao registrar o admin');
+            throw new Error(error.message ? `Erro ao registrar admin: ${error.message}` : 'Erro ao registrar o admin');
     }
 }

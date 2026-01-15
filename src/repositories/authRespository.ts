@@ -28,6 +28,6 @@ export const login = async (data: loginDTO): Promise<responseLogin> => {
         }
         return (response);
     } catch (error: any) {
-        throw new Error(error.message)
+            throw new Error(error.message ? `Erro ao realizar login: ${error.message}` : 'Erro ao realizar login');
     }
 }
