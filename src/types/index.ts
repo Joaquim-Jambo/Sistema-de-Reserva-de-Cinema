@@ -1,0 +1,1 @@
+export type EntityExists = "email" | "category" | "title"
