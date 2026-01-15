@@ -1,7 +1,7 @@
 import express from 'express';
-import { createSessionController, getAllSessionController, getSessionByFilterController } from '../controllers/sessionController';
+import { createSessionController, getAllSessionController, getSessionByFilterController, updateSessionController } from '../controllers/sessionController';
 import { validateBody, validateParams } from '../middlewares/index';
-import { createSessionSchema } from '../schemas/sessionSchema';
+import { createSessionSchema, updateSessionSchema } from '../schemas/sessionSchema';
 import { idSchema } from '../schemas';
 import { deleteCategoryController } from '../controllers/categoryController';
 
@@ -13,5 +13,6 @@ sessionRoutes.post("/", validateBody(createSessionSchema), createSessionControll
 sessionRoutes.get("/", getAllSessionController);
 sessionRoutes.get("/filter", getSessionByFilterController);
 sessionRoutes.delete("/:id", validateParams(idSchema), deleteCategoryController);
+sessionRoutes.put("/:id", validateParams(idSchema), validateBody(updateSessionSchema), updateSessionController);
 
 export default sessionRoutes;
