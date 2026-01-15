@@ -1,6 +1,6 @@
 import express from 'express';
-import { createSessionController, getAllSessionController, getSessionByFilterController } from '../controllers/session';
-import { validateBody } from '../middlewares/auth';
+import { createSessionController, getAllSessionController, getSessionByFilterController } from '../controllers/sessionController';
+import { validateBody } from '../middlewares/index';
 import { createSessionSchema } from '../schemas/sessionSchema';
 
 

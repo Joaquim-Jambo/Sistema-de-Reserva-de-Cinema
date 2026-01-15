@@ -1,1 +1,1 @@
-export type filter = 'dataSession' | 'movie' | 'room' | 'seats'
+export type filter = 'dataSession' | 'movie' | 'room' | 'seats' | 'id'
