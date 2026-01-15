@@ -1,7 +1,7 @@
-import { id } from "zod/locales";
 import prisma from "../config/prismaClient"
 import { session, sessionFilter } from "../models/sessionModel"
 import { filter } from "../types/session";
+import { filterGeneric } from "../models";
 
 export const createSession = async (data: session) => {
     try {
@@ -15,10 +15,9 @@ export const createSession = async (data: session) => {
         return session;
     } catch (error: any) {
         console.error(error.message)
-        throw new Error(error.message || "Erro ao registrar a sessão");
+        throw new Error(error.message ? `Erro ao registrar sessão: ${error.message}` : "Erro ao registrar a sessão");
     }
 }
-
 export const getAllSession = async (page: number = 1, limit: number = 10) => {
     try {
         const skip = (page - 1) * limit;
@@ -36,18 +35,19 @@ export const getAllSession = async (page: number = 1, limit: number = 10) => {
             }),
             prisma.session.count()
         ])
-        return ({
+        const response: filterGeneric<typeof sessions> = {
             data: sessions,
             pagination: {
                 page,
                 limit,
                 total,
-                totalPages: Math.ceil(total / limit)
+                totalPage: Math.ceil(total - limit)
             }
-        })
+        }
+        return (response)
     } catch (error: any) {
         console.error(error.message);
-        throw new Error("Erro ao listar as sessões");
+        throw new Error(error.message ? `Erro ao listar sessões: ${error.message}` : "Erro ao listar as sessões");
     }
 }
 type filterHandler = {
@@ -99,9 +99,16 @@ const handler: filterHandler = {
         }
         )
         return (sessionsWithStats);
-
+    },
+    id: async (id: string) => {
+        const session = await prisma.session.findUnique({
+            where: { id },
+            include: { movie: { select: { id: true, title: true, description: true } } }
+        })
+        return session;
     }
 }
+
 export const getSessionByFilter = async (data: Partial<sessionFilter>) => {
     try {
         const key = Object.keys(data)[0] as filter;
@@ -111,6 +118,6 @@ export const getSessionByFilter = async (data: Partial<sessionFilter>) => {
         }
     } catch (error: any) {
         console.error(error.message);
-        throw new Error("Erro ao listar as sessões");
+        throw new Error(error.message ? `Erro ao filtrar sessões: ${error.message}` : "Erro ao listar as sessões");
     }
 }
