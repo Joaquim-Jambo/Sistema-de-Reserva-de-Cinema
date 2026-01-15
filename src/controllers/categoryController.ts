@@ -1,8 +1,9 @@
 import { type Request, type Response } from "express"
 import { createCategorySchema, filterCategoriesSchema } from "../schemas/categorySchema"
-import { createCategory, deleteCategory, getAllCategory, updateCategory } from "../repositories/categoriesRepository"
+import { createCategory, deleteCategory, getAllCategory, getOneCategory, updateCategory } from "../repositories/categoriesRepository"
 import { ZodError } from "zod";
 import { idSchema } from "../schemas";
+import { id } from "zod/locales";
 
 export const createCategoryController = async (req: Request<{}, {}, createCategorySchema>, res: Response) => {
     try {
@@ -70,7 +71,26 @@ export const deleteCategoryController = async (req: Request<idSchema, {}, {}, {}
     try {
         const { id } = req.params;
         await deleteCategory(id);
-        res.send(204)
+        res.status(204).json({})
+    } catch (error: any) {
+        console.error(error)
+        if (error.message.includes("Categoria não encontrada"))
+            return res.status(404).json({
+                error: true,
+                message: error.message
+            })
+        return res.status(500).json({
+            error: true,
+            message: " Erro interno do servidor ao actualizar a categoria."
+        })
+    }
+}
+
+export const getOneCategoryController = async (req: Request<idSchema, {}, {}, {}>, res: Response) => {
+    try {
+        const { id } = req.params;
+        const category = getOneCategory(id);
+        res.status(200).json(category);
     } catch (error: any) {
         console.error(error)
         if (error.message.includes("Categoria não encontrada"))

@@ -25,7 +25,7 @@ export const getAllCategory = async (page: number = 1, limit: number = 10) => {
 
         const [categories, total] = await Promise.all([
             prisma.category.findMany({
-                select: { movieCategorie: true },
+                select: { movieCategorie: true, name: true, id: true },
                 skip,
                 take: limit,
                 orderBy: { name: 'asc' }
@@ -51,7 +51,7 @@ export const getOneCategory = async (id: string) => {
     try {
         const category = await prisma.category.findUnique({
             where: { id },
-            include: { movieCategorie: true }
+            select:{name: true, id: true, movieCategorie: true}
         })
         if (!category)
             throw new Error("Categoria não encontrada");
