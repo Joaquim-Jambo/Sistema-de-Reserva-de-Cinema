@@ -65,6 +65,7 @@ model Movie {
   id              String           @id @default(uuid())
   title           String           @unique
   description     String
+  coverImageUrl   String
   movieCategories MovieCategorie[]
   sessions        Session[]
   createdAt       DateTime         @default(now()) @map("created_at")
@@ -104,8 +105,8 @@ model Session {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   room         Room          @relation(fields: [roomId], references: [id])
-  movie        Movie         @relation(fields: [movieId], references: [id])
   reservations Reservation[]
+  movie        Movie         @relation(fields: [movieId], references: [id])
 
   @@unique([roomId, data])
   @@map("sessions")
