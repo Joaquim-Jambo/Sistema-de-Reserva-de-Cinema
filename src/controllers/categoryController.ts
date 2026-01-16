@@ -1,14 +1,15 @@
 import { type Request, type Response } from "express"
-import { createCategorySchema, filterCategoriesSchema } from "../schemas/categorySchema"
+import { createCategorySchema } from "../schemas/categorySchema"
 import { createCategory, deleteCategory, getAllCategory, getOneCategory, updateCategory } from "../repositories/categoriesRepository"
 import { ZodError } from "zod";
-import { idSchema } from "../schemas";
+import { filterSchema, idSchema } from "../schemas";
 import { id } from "zod/locales";
 
 export const createCategoryController = async (req: Request<{}, {}, createCategorySchema>, res: Response) => {
     try {
         const { name } = req.body;
-        const category = await createCategory({ name });
+        const id = crypto.randomUUID();
+        const category = await createCategory({ id, name });
         res.status(201).json(category);
     } catch (error: any) {
         console.error(error);
@@ -25,7 +26,7 @@ export const createCategoryController = async (req: Request<{}, {}, createCatego
     }
 }
 
-export const getAllCategoryController = async (req: Request<{}, {}, {}, filterCategoriesSchema>, res: Response) => {
+export const getAllCategoryController = async (req: Request<{}, {}, {}, filterSchema>, res: Response) => {
     try {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
