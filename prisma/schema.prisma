@@ -88,8 +88,8 @@ model MovieCategorie {
   id         String   @id @default(uuid())
   movieId    String   @map("movie_id")
   categoryId String   @map("category_id")
-  movie      Movie    @relation(fields: [movieId], references: [id])
-  category   Category @relation(fields: [categoryId], references: [id])
+  movie      Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now()) @map("created_at")
 
   @@index([movieId, categoryId])

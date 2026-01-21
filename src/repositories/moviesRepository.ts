@@ -1,7 +1,7 @@
 import prisma from "../config/prismaClient";
 import { filterGeneric } from "../models";
 import { movie } from "../models/movieModel";
-import { filter } from "../types/session";
+import { filterMovies, moviesFilter } from "../types/movies";
 import { verifyExist } from "../utils";
 
 export const createMovie = async (data: movie) => {
@@ -23,9 +23,14 @@ export const createMovie = async (data: movie) => {
                     }))
                 }
             },
-            include: { movieCategories: true, sessions: true }
+            include: { movieCategories: { include: { category: true } }, sessions: true }
         })
-        return movie;
+        const mapped = {
+            ...movie,
+            categoryIds: movie.movieCategories.map((mc) => mc.categoryId),
+            categories: movie.movieCategories.map((mc) => mc.category ? { id: mc.category.id, name: mc.category.name } : { id: mc.categoryId, name: '' })
+        }
+        return mapped;
     } catch (error: any) {
         console.error(error.message)
         throw new Error(error.message ? `Erro ao registra o filme: ${error.message}` : "Erro ao registrar o filme");
@@ -41,17 +46,19 @@ export const getAllMovies = async (page: number = 1, limit: number = 10) => {
                 skip,
                 take: limit,
                 orderBy: { title: 'asc' },
-                include: { movieCategories: true }
+                include: { movieCategories: { include: { category: true } } },
             }),
             prisma.movie.count()
         ])
-        const moviesWithCategoriesId = movies.map((movie) => ({
+        const moviesWithCategories = movies.map((movie) => ({
             ...movie,
-            categoryIds: movie.movieCategories.map((mc) => mc.categoryId)
-        })
-        );
+            categoryIds: movie.movieCategories.map((mc) => mc.categoryId),
+            categories: movie.movieCategories.map((mc) => mc.category ? { id: mc.category.id, name: mc.category.name } : { id: mc.categoryId, name: '' })
+        }
+        ));
+
         const response: filterGeneric<movie[]> = {
-            data: moviesWithCategoriesId,
+            data: moviesWithCategories,
             pagination: {
                 page,
                 limit,
@@ -65,5 +72,65 @@ export const getAllMovies = async (page: number = 1, limit: number = 10) => {
         throw new Error(error.message ? `Erro ao listar os filme: ${error.message}` : "Erro ao listar os filme");
     }
 }
+type filterHandler = {
+    [K in filterMovies]?: (value: filterMovies) => Promise<unknown>
+}
 
-// export const getMoviesByFilter = 
+const handler: filterHandler = {
+    id: async (id: string) => {
+        try {
+            const movie = await prisma.movie.findMany({
+                where: { id },
+                include: { movieCategories: { include: { category: true } } }
+            })
+            const moviesWithCategory = movie.map((movie) => ({
+                ...movie,
+                categoryIds: movie.movieCategories.map((mc) => mc.categoryId),
+                categories: movie.movieCategories.map((mc) => mc.category ? { id: mc.category.id, name: mc.category.name } : { id: mc.categoryId, name: '' })
+            }))
+            return moviesWithCategory;
+        } catch (error: any) {
+            console.error(error.message)
+            throw new Error(error.message ? `Erro ao listar o filme: ${error.message}` : "Erro ao listar o filme");
+        }
+    },
+    category: async (name: string) => {
+        try {
+            const category = await prisma.category.findUnique({
+                where: { name },
+                include: {
+                    movieCategorie: {
+                        include: {
+                            movie: {
+                                include: { movieCategories: { include: { category: true } } }
+                            }
+                        }
+                    }
+                }
+            })
+            if (!category) return [];
+            const movies = category.movieCategorie.map((mc) => mc.movie).map((movie) => ({
+                ...movie,
+                categoryIds: movie.movieCategories.map((mc) => mc.categoryId),
+                categories: movie.movieCategories.map((mc) => mc.category ? { id: mc.category.id, name: mc.category.name } : { id: mc.categoryId, name: '' })
+            }))
+            return movies;
+
+        } catch (error: any) {
+            console.error(error.message)
+            throw new Error(error.message ? `Erro ao listar o filme: ${error.message}` : "Erro ao listar o filme");
+        }
+    }
+}
+export const getMoviesByFilter = async (data: Partial<moviesFilter>) => {
+    try {
+        const key = Object.keys(data)[0] as filterMovies;
+        const value = Object.values(data)[0] as filterMovies;
+        console.log(key);
+        if (handler[key])
+            return await handler[key](value);
+    } catch (error: any) {
+        console.error(error.message);
+        throw new Error(error.message ? `Erro ao filtrar filmes: ${error.message}` : "Erro ao listar os filmes");
+    }
+}
