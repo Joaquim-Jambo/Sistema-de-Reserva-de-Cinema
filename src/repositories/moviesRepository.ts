@@ -1,6 +1,7 @@
 import prisma from "../config/prismaClient";
 import { filterGeneric } from "../models";
-import { movie } from "../models/movieModel";
+import { movie, movieUpdate, MovieWithCategories } from "../models/movieModel";
+import { uploadImage } from "../service/uploadImageService";
 import { filterMovies, moviesFilter } from "../types/movies";
 import { verifyExist } from "../utils";
 
@@ -21,7 +22,14 @@ export const createMovie = async (data: movie) => {
                             connect: { id: categoryId }
                         }
                     }))
-                }
+                },
+                duration: data.duration,
+                cast: data.cast,
+                premiereDate: data.premiereDate,
+                director: data.director,
+                countryOfOrigin: data.countryOfOrigin,
+                trailerVideoUrl: data.trailerVideoUrl,
+                distribuitor: data.distribuitor
             },
             include: { movieCategories: { include: { category: true } }, sessions: true }
         })
@@ -134,3 +142,43 @@ export const getMoviesByFilter = async (data: Partial<moviesFilter>) => {
         throw new Error(error.message ? `Erro ao filtrar filmes: ${error.message}` : "Erro ao listar os filmes");
     }
 }
+export const updateMovie = async (data: movieUpdate, id: string) => {
+    try {
+        const coverUrl = data.coverImageUrl ? await uploadImage(data.coverImageUrl) : data.coverImageUrl;
+        const movieUpdated = await prisma.movie.update({
+            where: { id },
+            data: {
+                ...data,
+                coverImageUrl: coverUrl,
+                movieCategories: {
+                    update: data.categoryIds?.map((categoryId) => ({
+                        where: { id },
+                        data: {
+                            category: {
+                                connect: { id: categoryId }
+                            }
+                        }
+                    }))
+                },
+            },
+            include: { movieCategories: true }
+        })
+        return movieUpdated;
+    } catch (error: any) {
+        console.error(error.message)
+        throw new Error("Erro ao actualizar o filme");
+    }
+}
+
+
+export const deleteMovie = async (id: string) => {
+    try {
+        await prisma.movie.delete({
+            where: { id }
+        });
+    } catch (error: any) {
+        console.error(error.message)
+        throw new Error("Erro ao eliminar o filme");
+    }
+}
+// export const 

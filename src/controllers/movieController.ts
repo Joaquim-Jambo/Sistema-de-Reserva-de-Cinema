@@ -1,15 +1,16 @@
 import { type Request, type Response } from "express"
-import { createMovieSchema } from "../schemas/movieSchema"
-import { createMovie, getAllMovies, getMoviesByFilter } from "../repositories/moviesRepository"
+import { createMovieSchema, filterMovieSchema, updateMovieSchema } from "../schemas/movieSchema"
+import { createMovie, deleteMovie, getAllMovies, getMoviesByFilter, updateMovie } from "../repositories/moviesRepository"
 import { uploadImage } from "../service/uploadImageService";
-import { filterSchema } from "../schemas";
+import { filterSchema, idSchema } from "../schemas";
 import { moviesFilter } from "../types/movies";
+import { movieUpdate } from "../models/movieModel";
 
 export const createMovieController = async (req: Request<{}, {}, createMovieSchema, {}>, res: Response) => {
     try {
-        const { title, description, categoryIds, coverImageUrl } = req.body;
+        const { title, description, categoryIds, coverImageUrl, trailerVideoUrl, duration, cast, distribuitor, countryOfOrigin, premiereDate, director } = req.body;
         const coverUrl = await uploadImage(coverImageUrl);
-        const movie = await createMovie({ title, description, categoryIds, coverImageUrl: coverUrl });
+        const movie = await createMovie({ coverImageUrl: coverUrl, title, description, categoryIds, trailerVideoUrl, duration, cast, distribuitor, countryOfOrigin, premiereDate, director });
         res.status(201).json(movie);
     } catch (error: any) {
         console.error(error.message)
@@ -35,16 +36,40 @@ export const getAllMoviesController = async (req: Request<{}, {}, {}, filterSche
     }
 }
 
-export const getMoviesByFilterController = async (req: Request, res: Response) => {
+export const getMoviesByFilterController = async (req: Request<{}, {}, {}, filterMovieSchema>, res: Response) => {
     try {
         const key = req.query.category ? "category" : "id";
         const filter: Partial<moviesFilter> = {
             [key]: key === "category" ? req.query.category as string : req.query.id as string
         };
         const movies = await getMoviesByFilter(filter);
-        res.status(200).json(movies)
+        res.status(200).json({ data: movies });
     } catch (error: any) {
         console.error(error.message);
         throw new Error(error.message ? `Erro ao filtra filme: ${error.message}` : "Erro ao filtrar os filmes");
+    }
+}
+
+export const updateMovieController = async (req: Request<idSchema, {}, updateMovieSchema, {}>, res: Response) => {
+    try {
+        const data: movieUpdate = {
+            ...req.body
+        }
+        const id = req.params.id;
+        const movieUpdated = await updateMovie(data, id);
+        res.status(200).json(movieUpdated);
+    } catch (error: any) {
+        console.error(error.message);
+        throw new Error(error.message ? `Erro ao filtra filme: ${error.message}` : "Erro ao filtrar os filmes");
+    }
+}
+export const deleteMovieController = async (req: Request<idSchema>, res: Response) => {
+    try {
+        const id = req.params.id;
+        await deleteMovie(id);
+        res.status(204).send();
+    } catch (error: any) {
+        console.error(error.message);
+        throw new Error("Erro ao eliminar o filme");
     }
 }
