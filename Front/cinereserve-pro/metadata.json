@@ -1,0 +1,7 @@
+{
+  "name": "CineClick",
+  "description": "Reserve ingressos de cinema em segundos. Escolha seu filme, selecione seus assentos e garanta sua sessão com apenas alguns cliques. Simples, rápido e sem filas.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
