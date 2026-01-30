@@ -16,6 +16,12 @@ model Role {
   @@map("roles")
 }
 
+enum STATUS_TICKET {
+  ACTIVE
+  USED
+  CANCELLED
+}
+
 enum ReservationStatus {
   PENDING
   CONFIRMED
@@ -45,6 +51,7 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
   client    Client?
   role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviews   Review[]
 
   @@map("users")
 }
@@ -66,12 +73,30 @@ model Movie {
   title           String           @unique
   description     String
   coverImageUrl   String
+  trailerVideoUrl String
+  duration        String
+  director        String
+  countryOfOrigin String           @map("country_of_origin")
+  cast            String
+  premiereDate    DateTime         @map("premiere_date")
+  distributor    String
   movieCategories MovieCategorie[]
   sessions        Session[]
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
+  reviews         Review[]
 
   @@map("movies")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  movieId   String   @map("movie_id")
+  userId    String   @map("user_id")
+  stars     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  movie     Movie    @relation(fields: [movieId], references: [id])
 }
 
 model Category {
@@ -100,6 +125,7 @@ model Session {
   id        String   @id @default(uuid())
   movieId   String   @map("movie_id")
   roomId    String   @map("room_id")
+  price     Float
   data      DateTime
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -131,8 +157,8 @@ model Reservation {
   status    ReservationStatus @default(PENDING)
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
-
-  session Session @relation(fields: [sessionId], references: [id])
+  tickets   Ticket[]
+  session   Session           @relation(fields: [sessionId], references: [id])
 
   @@map("reservations")
 }
@@ -144,4 +170,16 @@ model ReservationSeat {
 
   @@index([seatId, reservationId])
   @@map("reservation_seats")
+}
+
+model Ticket {
+  id            String        @id @default(uuid())
+  seatId        String        @map("seat_id")
+  reservationId String        @map("reservation_id")
+  codeAccess    String        @map("code_access")
+  reservation   Reservation   @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  status        STATUS_TICKET @default(ACTIVE)
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  @@map("tickets")
 }
