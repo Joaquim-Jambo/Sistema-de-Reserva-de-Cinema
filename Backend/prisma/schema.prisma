@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    String @id @default(uuid())
+  role  String
+  users User[]
+
+  @@map("roles")
+}
+
+enum STATUS_TICKET {
+  ACTIVE
+  USED
+  CANCELLED
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model Room {
+  id        String    @id @default(uuid())
+  number    Int
+  capacity  Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  sessions  Session[]
+  seats     Seat[]
+
+  @@map("rooms")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    String   @map("role_id")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  client    Client?
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviews   Review[]
+
+  @@map("users")
+}
+
+model Client {
+  id              String    @id @default(uuid())
+  userId          String    @unique @map("user_id")
+  phone           String?
+  dateOfBirth     DateTime? @map("date_of_birth")
+  preferredGenres String[]  @map("preferred_genres")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("clients")
+}
+
+model Movie {
+  id              String           @id @default(uuid())
+  title           String           @unique
+  description     String
+  coverImageUrl   String
+  trailerVideoUrl String
+  duration        String
+  director        String
+  countryOfOrigin String           @map("country_of_origin")
+  cast            String
+  premiereDate    DateTime         @map("premiere_date")
+  distributor    String
+  movieCategories MovieCategorie[]
+  sessions        Session[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  reviews         Review[]
+
+  @@map("movies")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  movieId   String   @map("movie_id")
+  userId    String   @map("user_id")
+  stars     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  movie     Movie    @relation(fields: [movieId], references: [id])
+}
+
+model Category {
+  id             String           @id @default(uuid())
+  name           String           @unique
+  movieCategorie MovieCategorie[]
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model MovieCategorie {
+  id         String   @id @default(uuid())
+  movieId    String   @map("movie_id")
+  categoryId String   @map("category_id")
+  movie      Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([movieId, categoryId])
+  @@map("movie_categories")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  movieId   String   @map("movie_id")
+  roomId    String   @map("room_id")
+  price     Float
+  data      DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  room         Room          @relation(fields: [roomId], references: [id])
+  reservations Reservation[]
+  movie        Movie         @relation(fields: [movieId], references: [id])
+
+  @@unique([roomId, data])
+  @@map("sessions")
+}
+
+model Seat {
+  id         String   @id @default(uuid())
+  roomId     String   @map("room_id")
+  numberSeat Int      @map("number_seat")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  room       Room     @relation(fields: [roomId], references: [id])
+
+  @@unique([roomId, numberSeat])
+  @@map("seats")
+}
+
+model Reservation {
+  id        String            @id @default(uuid())
+  sessionId String            @map("session_id")
+  userId    String            @map("user_id")
+  status    ReservationStatus @default(PENDING)
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  tickets   Ticket[]
+  session   Session           @relation(fields: [sessionId], references: [id])
+
+  @@map("reservations")
+}
+
+model ReservationSeat {
+  id            String @id @default(uuid())
+  seatId        String @map("seat_id")
+  reservationId String @map("reservation_id")
+
+  @@index([seatId, reservationId])
+  @@map("reservation_seats")
+}
+
+model Ticket {
+  id            String        @id @default(uuid())
+  seatId        String        @map("seat_id")
+  reservationId String        @map("reservation_id")
+  codeAccess    String        @map("code_access")
+  reservation   Reservation   @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  status        STATUS_TICKET @default(ACTIVE)
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  @@map("tickets")
+}
